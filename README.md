@@ -13,7 +13,7 @@ Usage
     Host mysql-tunnel # You can use any name
             HostName ssh-tunnel.corporate.tld # Tunnel 
             IdentityFile ~/.ssh/id_rsa # Private key location
-            User cagatay.guertuerk # Username to connect to SSH service
+            User john.doe # Username to connect to SSH service
             ForwardAgent yes
             TCPKeepAlive yes
             ConnectTimeout 5
@@ -26,7 +26,7 @@ Usage
     version: '2'
     services:
       mysql:
-        image: cagataygurturk/docker-ssh-tunnel:0.0.1
+        image: matchory/docker-ssh-tunnel:0.0.1
         volumes:
           - $HOME/.ssh:/root/ssh:ro
         environment:
