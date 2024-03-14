@@ -1,23 +1,18 @@
-FROM alpine:3.2
-MAINTAINER Moritz Friedrich <moritz@matchory.com>
+#syntax docker/dockerfile:1.6
+FROM alpine:3.19
+ARG KEY_VOLUME=/root/ssh
+ENV KEY_VOLUME=${KEY_VOLUME}
 
-RUN apk add --update openssh-client && rm -rf /var/cache/apk/*
+RUN <<eot
+set -eux
+apk add --update --no-cache openssh-client
+rm -rf /var/cache/apk/*
+mkdir -p "${KEY_VOLUME}"
+chmod 0700 "${KEY_VOLUME}"
+eot
 
-CMD rm -rf /root/.ssh && \
-    mkdir /root/.ssh && \
-    cp -R /root/ssh/* /root/.ssh/ && \
-    chmod -R 600 /root/.ssh/* && \
-    echo "Establishing tunnel from $(hostname):${LOCAL_PORT} via ${TUNNEL_HOST} to ${REMOTE_HOST}:${REMOTE_PORT}" && \
-    ssh \
-    ${SSH_ARGS} \
-    -o TcpKeepAlive=yes \
-    -o StrictHostKeyChecking=no \
-    -o ExitOnForwardFailure=yes \
-    -o "ConnectTimeout=${CONNECTION_TIMEOUT:-3}" \
-    -o "ConnectionAttempts=${CONNECTION_ATTEMPTS:-3}" \
-    -o "ServerAliveInterval=${SERVER_ALIVE_INTERVAL:-30}" \
-    -N "${TUNNEL_HOST}" \
-    -L "*:${LOCAL_PORT}:${REMOTE_HOST}:${REMOTE_PORT}" && \
-    while true; do sleep 30; done;
+COPY --link --chmod=700 ./entrypoint.sh /entrypoint.sh
 
 EXPOSE 1-65535
+VOLUME "${KEY_VOLUME}"
+ENTRYPOINT ["/entrypoint.sh"]
