@@ -1,4 +1,4 @@
-#syntax docker/dockerfile:1.6
+# syntax=docker/dockerfile:1.6
 FROM alpine:3.19
 ARG KEY_VOLUME=/root/ssh
 ENV KEY_VOLUME=${KEY_VOLUME}
